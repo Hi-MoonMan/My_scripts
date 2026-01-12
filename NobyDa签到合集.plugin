@@ -1,0 +1,60 @@
+#!name= NobyDa签到合集
+#!desc= 按需开启相关任务，定时每日自动完成。
+获取Cookie后，关闭Token，避免不必要重复获取导致异常。
+#!author= @NobyDa @MoonMan
+#!homepage= https://github.com/NobyDa/Script/tree/master
+#!icon= https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/javascript/javascript.png
+#!date=2026-01-12 21:00:00
+
+[Argument]
+# --- 携程旅行 ---
+ctrip-token = switch, true, false, tag = [携程旅行]获取Token, desc = 开启后打开App获取Cookie
+ctrip-task = switch, true, false, tag = [携程旅行]签到Task, desc = 开启后系统会自动后台签到
+ctrip-cron = input, "0 0 8 * * *", tag = [携程旅行]时间Cron, desc = 默认每天8点
+
+# --- 爱奇艺 ---
+iqiyi-token = switch, true, false, tag = [爱奇艺]获取Token, desc = 开启后打开App获取Cookie
+iqiyi-task = switch, true, false, tag = [爱奇艺]签到Task, desc = 开启后系统会自动后台签到
+iqiyi-cron = input, "0 10 8 * * *", tag = [爱奇艺]时间Cron, desc = 默认每天8点10分
+
+# --- 百度贴吧 ---
+tieba-token = switch, true, false, tag = [百度贴吧]获取Token, desc = 开启后打开App获取Cookie
+tieba-task = switch, true, false, tag = [百度贴吧]签到Task, desc = 开启后系统会自动后台签到
+tieba-cron = input, "0 20 8 * * *", tag = [百度贴吧]时间Cron, desc = 默认每天8点20分
+
+# --- 哔哩漫画 ---
+bili-token = switch, true, false, tag = [哔哩漫画]获取Token, desc = 开启后打开App获取Cookie
+bili-task = switch, true, false, tag = [哔哩漫画]签到Task, desc = 开启后系统会自动后台签到
+bili-cron = input, "0 30 8 * * *", tag = [哔哩漫画]时间Cron, desc = 默认每天8点30分
+
+# --- 快看漫画 ---
+kkmh-token = switch, true, false, tag = [快看漫画]获取Token, desc = 开启后打开App获取Cookie
+kkmh-task = switch, true, false, tag = [快看漫画]签到Task, desc = 开启后系统会自动后台签到
+kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认每天8点40分
+
+[Script]
+# --- 携程旅行 Scripts ---
+http-response ^https:\/\/m\.ctrip\.com\/restapi\/soa2\/\d+\/[a-zA-Z]+Login(?:$|\?) script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Ctrip-DailyBonus/Ctrip.js, requires-body=true, tag=携程旅行获取Cookie, enabled={ctrip-token}
+cron {ctrip-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Ctrip-DailyBonus/Ctrip.js, tag=携程旅行签到, enabled={ctrip-task}
+
+# --- 爱奇艺 Scripts ---
+# 获取 Cookie (仅受 iqiyi-token 控制)
+http-request ^https:\/\/passport\.iqiyi\.com\/apis\/user\/ script-path=https://raw.githubusercontent.com/NobyDa/Script/master/iQIYI-DailyBonus/iQIYI.js, tag=爱奇艺获取Cookie, enabled={iqiyi-token}
+# 执行 签到 (受 iqiyi-task 控制，且使用 iqiyi-cron 设置的时间)
+cron {iqiyi-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/iQIYI-DailyBonus/iQIYI.js, tag=爱奇艺签到, enabled={iqiyi-task}
+
+# --- 百度贴吧 Scripts ---
+http-request ^https?:\/\/(c\.tieba|tiebac)\.baidu\.com\/c\/s\/login script-path=https://raw.githubusercontent.com/NobyDa/Script/master/BDTieBa-DailyBonus/TieBa.js, tag=百度贴吧获取Cookie, enabled={tieba-token}
+cron {tieba-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/BDTieBa-DailyBonus/TieBa.js, tag=百度贴吧签到, enabled={tieba-task}
+
+# --- 哔哩漫画 Scripts ---
+http-request ^https:\/\/app\.bilibili\.com\/x\/v2\/account\/myinfo script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Bilibili-DailyBonus/Manga.js, tag=哔哩漫画获取Cookie, enabled={bili-token}
+cron {bili-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Bilibili-DailyBonus/Manga.js, tag=哔哩漫画签到, enabled={bili-task}
+
+# --- 快看漫画 Scripts ---
+http-request ^https?:\/\/api\.kkmh\.com\/v\d\/passport\/user script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画获取Cookie, enabled={kkmh-token}
+cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画签到, enabled={kkmh-task}
+
+
+[MITM]
+hostname = m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
