@@ -1,17 +1,20 @@
-/***************
+/**********
 
-万年历Pro
+万年历 解锁VIP
 
 [filter_local]
 host,ad.51wnl-cq.com,reject
 host,adn.51wnl-cq.com,reject
 
+[Script]
+# 使用正则表达式匹配 GetExtInfo 和 IsMember 两个接口
+http-response ^https?:\/\/r\.51wnl-cq\.com\/.*(User\/GetExtInfo|Member\/IsMember) script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/WNL_VIP.js, requires-body=true, tag=万年历VIP
 
 [mitm]
 
 hostname = r.51wnl-cq.com
 
-****************/
+**********/
 
 
 
