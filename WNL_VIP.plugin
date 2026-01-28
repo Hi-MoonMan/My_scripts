@@ -1,6 +1,6 @@
 #!name=万年历 VIP
 #!desc=去除开屏与横幅广告，解锁VIP会员功能
-#!author= @MoonMan
+#!author=@MoonMan
 #!homepage= https://github.com/Hi-MoonMan
 #!icon=https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/wnl.png
 #!date=2026-01-10 18:00:00
@@ -17,5 +17,6 @@ http-response ^https?:\/\/r\.51wnl-cq\.com\/.*(User\/GetExtInfo|Member\/IsMember
 [MitM]
 
 hostname = r.51wnl-cq.com
+
 
 
