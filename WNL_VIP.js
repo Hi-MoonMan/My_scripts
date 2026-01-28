@@ -6,9 +6,6 @@
 host,ad.51wnl-cq.com,reject
 host,adn.51wnl-cq.com,reject
 
-[rewrite_local]
-^https?:\/\/r\.51wnl-cq\.com\/api\/Member\/IsMember url script-response-body https://ddgksf2013.top/scripts/wannianli.vip.js
-https://r.51wnl-cq\.com\/Api\/User\/GetExtInfo url script-response-body https://ddgksf2013.top/scripts/wannianli.vip.js
 
 [mitm]
 
