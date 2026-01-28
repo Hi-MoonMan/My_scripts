@@ -1,7 +1,7 @@
-#!name= NobyDa签到合集
+#!name= 自动签到脚本汇总（自用）
 #!desc= 按需开启相关任务，定时每日自动完成。
 获取Cookie后，关闭Token，避免不必要重复获取导致异常。
-#!author= @Sliverkiss @NobyDa @苏微凉
+#!author= @Sliverkiss @NobyDa @MoonMan
 #!homepage= MoonMan
 #!icon= https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/JiaoBen%20.png
 #!date=2026-01-28 21:00:00
@@ -66,3 +66,4 @@ cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/mas
 
 [MITM]
 hostname = gw.xiaocantech.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+
