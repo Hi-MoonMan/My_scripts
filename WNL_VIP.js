@@ -2,8 +2,6 @@
 
 万年历Pro
 
-https://t.me/ddgksf2021
-
 [filter_local]
 host,ad.51wnl-cq.com,reject
 host,adn.51wnl-cq.com,reject
