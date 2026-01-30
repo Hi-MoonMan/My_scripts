@@ -17,6 +17,3 @@ http-response ^https?:\/\/r\.51wnl-cq\.com\/.*(User\/GetExtInfo|Member\/IsMember
 [MitM]
 
 hostname = r.51wnl-cq.com
-
-
-
