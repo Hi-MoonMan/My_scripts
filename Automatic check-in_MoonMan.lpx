@@ -7,9 +7,19 @@
 
 [Argument]
 # --- 小蚕惠生活 ---
-xcbwc-token = switch, false, false, tag = [小蚕惠生活]获取Token, desc = 开启后抓取 Cookie
+xcbwc-token = switch, false, false, tag = [小蚕惠生活]获取Token, desc = 开启后打开App获取Cookie
 xcbwc-task  = switch, false, false, tag = [小蚕惠生活]签到Task, desc = 开启后系统会自动后台签到
-xcbwc-cron  = input, "0 50 7 * * *", tag = [小蚕惠生活]时间Cron, desc = 默认每天7点50分
+xcbwc-cron  = input, "0 30 7 * * *", tag = [小蚕惠生活]时间Cron, desc = 默认每天7点30分
+
+# --- 歪麦霸王餐 ---
+wmbwc-token = switch, false, false, tag = [歪麦霸王餐]获取Token, desc = 开启后打开App获取Cookie
+wmbwc-task  = switch, false, false, tag = [歪麦霸王餐]签到Task, desc = 开启后系统会自动后台签到
+wmbwc-cron  = input, "0 40 7 * * *", tag = [歪麦霸王餐]时间Cron, desc = 默认每天7点40分
+
+# --- 晓晓优选 ---
+xxyx-token = switch, false, false, tag = [晓晓优选]获取Token, desc = 开启后打开App获取Cookie
+xxyx-task  = switch, false, false, tag = [晓晓优选]签到Task, desc = 开启后系统会自动后台签到
+xxyx-cron  = input, "0 50 7 * * *", tag = [晓晓优选]时间Cron, desc = 默认每天7点50分
 
 # --- 携程旅行 ---
 ctrip-token = switch, true, false, tag = [携程旅行]获取Token, desc = 开启后打开App获取Cookie
@@ -41,14 +51,20 @@ kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认
 http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
 cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
 
+# --- 歪麦霸王餐 Scripts ---
+http-request ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
+cron {wmbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐定时任务, enabled={wmbwc-task}
+
+# --- 晓晓优选 Scripts ---
+http-request ^https:\/\/xxyx-client-api\.xiaoxiaoyouxuan\.com\/my script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选获取Cookie, enabled={xxyx-token}
+cron {xxyx-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选定时任务, enabled={xxyx-task}
+
 # --- 携程旅行 Scripts ---
 http-response ^https:\/\/m\.ctrip\.com\/restapi\/soa2\/\d+\/[a-zA-Z]+Login(?:$|\?) script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Ctrip-DailyBonus/Ctrip.js, requires-body=true, tag=携程旅行获取Cookie, enabled={ctrip-token}
 cron {ctrip-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Ctrip-DailyBonus/Ctrip.js, tag=携程旅行签到, enabled={ctrip-task}
 
 # --- 爱奇艺 Scripts ---
-# 获取 Cookie (仅受 iqiyi-token 控制)
 http-request ^https:\/\/passport\.iqiyi\.com\/apis\/user\/ script-path=https://raw.githubusercontent.com/NobyDa/Script/master/iQIYI-DailyBonus/iQIYI.js, tag=爱奇艺获取Cookie, enabled={iqiyi-token}
-# 执行 签到 (受 iqiyi-task 控制，且使用 iqiyi-cron 设置的时间)
 cron {iqiyi-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/iQIYI-DailyBonus/iQIYI.js, tag=爱奇艺签到, enabled={iqiyi-task}
 
 # --- 百度贴吧 Scripts ---
@@ -64,7 +80,8 @@ http-request ^https?:\/\/api\.kkmh\.com\/v\d\/passport\/user script-path=https:/
 cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画签到, enabled={kkmh-task}
 
 [MITM]
-hostname = gw.xiaocantech.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+hostname = gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+
 
 
 
