@@ -48,15 +48,15 @@ kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认
 
 [Script]
 # --- 小蚕惠生活 Scripts ---
-http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
+http-response ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, requires-body=true, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
 cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
 
 # --- 歪麦霸王餐 Scripts ---
-http-request ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
+http-response ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, requires-body=true, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
 cron {wmbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐定时任务, enabled={wmbwc-task}
 
 # --- 晓晓优选 Scripts ---
-http-request ^https:\/\/xxyx-client-api\.xiaoxiaoyouxuan\.com\/my script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选获取Cookie, enabled={xxyx-token}
+http-response ^https:\/\/xxyx-client-api\.xiaoxiaoyouxuan\.com\/my script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, requires-body=true, tag=晓晓优选获取Cookie, enabled={xxyx-token}
 cron {xxyx-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选定时任务, enabled={xxyx-task}
 
 # --- 携程旅行 Scripts ---
@@ -81,6 +81,7 @@ cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/mas
 
 [MITM]
 hostname = gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+
 
 
 
