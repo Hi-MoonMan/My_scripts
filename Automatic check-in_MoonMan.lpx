@@ -48,7 +48,7 @@ kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认
 
 [Script]
 # --- 小蚕惠生活 Scripts ---
-http-response ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
+http-response ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, requires-body=true, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
 cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
 
 # --- 歪麦霸王餐 Scripts ---
@@ -81,6 +81,7 @@ cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/mas
 
 [MITM]
 hostname = gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+
 
 
 
