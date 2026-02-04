@@ -52,7 +52,7 @@ http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githu
 cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
 
 # --- 歪麦霸王餐 Scripts ---
-http-request ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
+http-response ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, requires-body=true, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
 cron {wmbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐定时任务, enabled={wmbwc-task}
 
 # --- 晓晓优选 Scripts ---
@@ -81,6 +81,7 @@ cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/mas
 
 [MITM]
 hostname = gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+
 
 
 
