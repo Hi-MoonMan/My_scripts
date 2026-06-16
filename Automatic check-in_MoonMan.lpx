@@ -57,8 +57,8 @@ http-request ^https:\/\/www\.iios\.fun\/api\/user\/info script-path=https://raw.
 cron {iios-cron} script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站定时任务, enabled={iios-task}
 
 # --- 小蚕惠生活 Scripts ---
-http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
-cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/250a02315f0a2c99f42da3b3573375c8/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
+http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/27c601d97a3f8960b212e5cac5b6c470/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
+cron {xcbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/27c601d97a3f8960b212e5cac5b6c470/raw/xcbwc.js, tag=小蚕惠生活定时任务, enabled={xcbwc-task}
 
 # --- 歪麦霸王餐 Scripts ---
 http-response ^https:\/\/wmapp-api\.waimaimingtang\.com\/api\/api\/v2\/user\/api_user_info_one script-path=https://gist.githubusercontent.com/Sliverkiss/49a9ffb2169a2becc33bf4fdbf6eb99a/raw/wmbwc.js, tag=歪麦霸王餐获取Cookie, enabled={wmbwc-token}
