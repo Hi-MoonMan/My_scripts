@@ -501,7 +501,7 @@ async function runCron() {
     
     saveDailyStats(dailyStats);
     
-    if (isLastRun && CONFIG.NOTIFY === "0") {
+    if (isLastRun && CONFIG.NOTIFY === "1") {
         sendDailySummary(dailyStats);
     }
 }
