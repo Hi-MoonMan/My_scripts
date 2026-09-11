@@ -1,6 +1,6 @@
 #!name=INSAV VIP
 #!desc=VIP 解锁 + 去广告 + getVideoUrl Token 替换 + 第三方播放器跳转
-#!author=@Jsforbaby
+#!author=@Jsforbaby @MoonMan
 #!homepage=https://github.com/Yu9191/Rewrite
 #!icon=https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/insav.png
 [Argument]
