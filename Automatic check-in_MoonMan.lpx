@@ -58,7 +58,7 @@ kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认
 
 [Script]
 # --- 一点万象 Scripts ---
-http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象获取Cookie, enabled={ydwx-token}
+http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, requires-body=true, tag=一点万象获取Cookie, enabled={ydwx-token}
 cron {ydwx-cron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象定时任务, enabled={ydwx-task}
 
 # --- 苹果软件站 Scripts ---
