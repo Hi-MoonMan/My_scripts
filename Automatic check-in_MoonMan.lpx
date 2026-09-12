@@ -6,6 +6,11 @@
 #!date= 2026-04-05 22:00:00
 
 [Argument]
+# --- 一点万象 ---
+ydwx-token = switch, true, false, tag = [一点万象]获取Token, desc = 开启后打开App获取Cookie
+ydwx-task  = switch, true, false, tag = [一点万象]签到Task, desc = 开启后系统会自动后台签到
+ydwx-cron  = input, "0 20 7 * * *", tag = [一点万象]时间Cron, desc = 默认每天7点20分
+
 # --- 苹果软件站 ---
 iios-token = switch, true, false, tag = [苹果软件站]获取Token, desc = 开启后打开App获取Cookie
 iios-task  = switch, true, false, tag = [苹果软件站]签到Task, desc = 开启后系统会自动后台签到
@@ -52,6 +57,10 @@ kkmh-task = switch, true, false, tag = [快看漫画]签到Task, desc = 开启�
 kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认每天8点40分
 
 [Script]
+# --- 一点万象 Scripts ---
+http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象获取Cookie, enabled={ydwx-token}
+cron {ydwx-cron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象定时任务, enabled={ydwx-task}
+
 # --- 苹果软件站 Scripts ---
 http-request ^https:\/\/www\.iios\.fun\/api\/user\/info script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站获取Cookie, enabled={iios-token}
 cron {iios-cron} script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站定时任务, enabled={iios-task}
@@ -89,7 +98,7 @@ http-request ^https?:\/\/api\.kkmh\.com\/v\d\/passport\/user script-path=https:/
 cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画签到, enabled={kkmh-task}
 
 [MITM]
-hostname = www.iios.fun, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+hostname = app.mixcapp.com, www.iios.fun, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
 
 
 
