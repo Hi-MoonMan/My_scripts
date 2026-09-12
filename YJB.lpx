@@ -2,7 +2,7 @@
 #!desc = 获取养基宝 Authorization，在工作日开盘、午间休市、收盘及晚间净值更新后推送基金资产汇总。首次使用请开启获取凭证并打开养基宝 App。
 #!author = 自定义
 #!homepage = https://github.com/Hi-MoonMan
-#!icon = https://github.com/Toperlock/Quantumult/raw/main/icon/Doraemon/Doraemon-1031.png
+#!icon = https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/yjb.png
 #!tag = 养基宝,基金,资产通报
 #!system = ios
 #!loon_version = 3.2.1(734)
