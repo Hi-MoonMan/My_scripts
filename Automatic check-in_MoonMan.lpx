@@ -64,7 +64,7 @@ kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认
 [Script]
 # --- 酷我音乐 Scripts ---
 http-request ^https?:\/\/360\.com\/kuwo script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/KWYY.js, requires-body=true, timeout=60, tag=酷我音乐助手面板, argument=[{phone},{ocr},{notify}]
-cron "15 7-23/1 * * *" script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/KWYY.js, timeout=120, tag=酷我音乐定时任务, argument=[{phone},{ocr},{notify}]
+cron "35 7-23/1 * * *" script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/KWYY.js, timeout=120, tag=酷我音乐定时任务, argument=[{phone},{ocr},{notify}]
 
 # --- 一点万象 Scripts ---
 http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, requires-body=true, tag=一点万象获取Cookie, enabled={ydwx-token}
