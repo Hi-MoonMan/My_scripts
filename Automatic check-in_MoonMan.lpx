@@ -1,11 +1,16 @@
-#!name= 自动签到脚本汇总（自用）
-#!desc= 按需开启相关任务，定时每日自动完成。获取Cookie后，请及时关闭脚本以防异常。
-#!author= @Sliverkiss @NobyDa @MoonMan
+#!name= 签到脚本汇总_自用
+#!desc= 按需开启相关任务，定时每日自动完成。获取Cookie后，及时关闭脚本以防异常。
+#!author= @Sliverkiss @NobyDa @怎么肥事 @bb @MoonMan
 #!homepage= https://github.com/Hi-MoonMan
 #!icon= https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/jb%20.png
-#!date= 2026-04-05 22:00:00
+#!date= 2026-09-13 20:00:00
 
 [Argument]
+# --- 酷我音乐 ---
+phone = input,"",tag=手机号,desc=用于Web登录的手机号(可留空)
+ocr = input,"",tag=360.com/kuwo验证码,desc=登录https://360.com/kuwo验证码识别API密钥(可留空)
+notify = switch,true,tag=通知开关,desc=关闭后不通知
+
 # --- 一点万象 ---
 ydwx-token = switch, true, false, tag = [一点万象]获取Token, desc = 开启后打开App获取Cookie
 ydwx-task  = switch, true, false, tag = [一点万象]签到Task, desc = 开启后系统会自动后台签到
@@ -57,6 +62,10 @@ kkmh-task = switch, true, false, tag = [快看漫画]签到Task, desc = 开启�
 kkmh-cron = input, "0 40 8 * * *", tag = [快看漫画]时间Cron, desc = 默认每天8点40分
 
 [Script]
+# --- 酷我音乐 Scripts ---
+http-request ^https?:\/\/360\.com\/kuwo script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/KWYY.js, requires-body=true, timeout=60, tag=酷我音乐助手面板, argument=[{phone},{ocr},{notify}]
+cron "15 7-23/1 * * *" script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/KWYY.js, timeout=120, tag=酷我音乐定时任务, argument=[{phone},{ocr},{notify}]
+
 # --- 一点万象 Scripts ---
 http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, requires-body=true, tag=一点万象获取Cookie, enabled={ydwx-token}
 cron {ydwx-cron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象定时任务, enabled={ydwx-task}
@@ -98,7 +107,7 @@ http-request ^https?:\/\/api\.kkmh\.com\/v\d\/passport\/user script-path=https:/
 cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画签到, enabled={kkmh-task}
 
 [MITM]
-hostname = app.mixcapp.com, www.iios.fun, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+hostname = 360.com, app.mixcapp.com, www.iios.fun, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
 
 
 
