@@ -15,7 +15,7 @@ noonCron = input,"35 11 * * 1-5",tag=午间通报时间,desc=默认工作日11:3
 
 closeCron = input,"5 15 * * 1-5",tag=收盘通报时间,desc=默认工作日15:05，建议设置在15:00收盘之后
 
-nightCron = input,"11 19 * * 1-5",tag=晚间净值通报时间,desc=默认工作日19:11，可根据基金真实净值更新时间调整
+nightCron = input,"00 20 * * 1-5",tag=晚间通报时间,desc=默认工作日20:00，可根据基金真实净值更新时间调整
 
 [Script]
 http-response ^https?:\/\/app-api\.yangjibao\.com\/ script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YJB.js,requires-body=false,timeout=30,enable={cookieEnable},tag=养基宝-获取Authorization
