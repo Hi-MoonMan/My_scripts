@@ -4,27 +4,26 @@ const $ = new Env('养基宝');
 
 const HOST = 'https://app-api.yangjibao.com';
 const SECRET = 'Zk0w9mX7IKFGo5qp5jyDwJKnU7ZJZZJwGhs5myg4vlv4lKEHFKxGe6jlb84KOLkx';
+const EASTMONEY_QUOTE_API = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f12,f14,f2,f3,f6&secids=1.000001,0.399001';
+
 const STORE_CK = 'yjb_ck';
 const STORE_DATA = 'yjb_account_collect';
 const STORE_TS = 'yjb_last_ts';
 const STORE_VIP = 'yjb_vip_data';
-const STORE_VIP_TS = 'yjb_vip_ts';
 const STORE_DAYINFO = 'yjb_dayinfo_cache';
 
 (async () => {
   const arg = parseArg();
   const mode = detectMode();
 
-  $.log(`[YJB] 2025-05-16`);
+  $.log(`[YJB] 2025-opt`);
 
   if (mode === 'response') {
     sniffToken();
   } else if (mode === 'panel') {
     await runPanel(arg);
-  } else if (arg.mode === 'vip') {
-    await runVipCron(arg);
   } else {
-    await runCron(arg);
+    await runCron(arg); // arg.mode === 'vip' 时也走同一套完整推送
   }
 })()
   .catch((e) => { $.logErr(e); })
@@ -72,11 +71,8 @@ function saveCK(auth, ua) {
   $.setdata(JSON.stringify({ auth, ua }), STORE_CK);
 }
 
-// ↓↓↓ 新增内容开始 ↓↓↓
 async function checkTradingDay(token, ua) {
   const todayKey = formatDateKey(new Date());
-
-  // 同一天内有缓存就不重复请求 /day_info
   try {
     const cacheRaw = $.getdata(STORE_DAYINFO);
     if (cacheRaw) {
@@ -88,9 +84,8 @@ async function checkTradingDay(token, ua) {
   const dayInfo = await fetchAPI(token, ua, '/day_info');
   if (!dayInfo || !dayInfo.data || typeof dayInfo.data.is_market_day === 'undefined') {
     $.log('[YJB] day_info 获取失败,本次默认按交易日处理');
-    return true; // 接口异常时容错放行,避免误判漏推
+    return true;
   }
-
   const isMarketDay = !!dayInfo.data.is_market_day;
   $.setdata(JSON.stringify({ date: todayKey, isMarketDay }), STORE_DAYINFO);
   return isMarketDay;
@@ -100,40 +95,30 @@ function formatDateKey(d) {
   const p = (x) => String(x).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
-// ↑↑↑ 新增内容结束 ↑↑↑
+
+// ------------------ 主流程 ------------------
 
 async function runCron(arg) {
   const ck = getCK();
   const token = arg.token || ck.auth;
-  if (!token) {
-    $.msg('养基宝', '未获取 Authorization', '请先打开 App 添加持有');
-    return;
-  }
+  if (!token) { $.msg('养基宝', '未获取 Authorization', '请先打开 App 添加持有'); return; }
 
-  // 新增:非交易日直接跳过,不拉取数据也不推送
   const tradingDay = await checkTradingDay(token, ck.ua);
-  if (!tradingDay) {
-    $.log('[YJB] 今日非交易日,跳过本次估值/净值推送');
-    return;
-  }
+  if (!tradingDay) { $.log('[YJB] 今日非交易日,跳过本次推送'); return; }
 
-  const [json, vipLines] = await Promise.all([
+  const [json, lines] = await Promise.all([
     fetchAccountCollect(token, ck.ua),
-    fetchVipLines(token, ck.ua),
+    fetchMarketLines(token, ck.ua),
   ]);
   if (!json) return;
 
   $.setdata(JSON.stringify(json), STORE_DATA);
   $.setdata(String(Date.now()), STORE_TS);
+  if (lines.length) $.setdata(JSON.stringify({ lines, ts: Date.now() }), STORE_VIP);
 
-  if (vipLines.length) {
-    $.setdata(JSON.stringify({ lines: vipLines, ts: Date.now() }), STORE_VIP);
-  }
-
-  const summary = buildSummary(json);
-  const vipBlock = vipLines.length ? '\n' + vipLines.join('\n') : '';
-  const title = `养基宝 · ${formatTime(new Date())}`;
-  $.msg(title, summary.subtitle, summary.body + vipBlock);
+  const s = buildSummary(json);
+  const title = `基金数据·${formatTime(new Date())} 『📈${s.upCount} ‖ ${s.downCount}📉』`;
+  $.msg(title, s.subtitle, lines.join('\n'));
 }
 
 async function runPanel(arg) {
@@ -142,20 +127,23 @@ async function runPanel(arg) {
 
   if (token) {
     try {
-      const json = await fetchAccountCollect(token, ck.ua);
+      const [json, lines] = await Promise.all([
+        fetchAccountCollect(token, ck.ua),
+        fetchMarketLines(token, ck.ua),
+      ]);
       if (json) {
         $.setdata(JSON.stringify(json), STORE_DATA);
         $.setdata(String(Date.now()), STORE_TS);
       }
+      if (lines.length) $.setdata(JSON.stringify({ lines, ts: Date.now() }), STORE_VIP);
     } catch (e) { $.logErr(e); }
   }
 
   const cached = $.getdata(STORE_DATA);
-  const ts = Number($.getdata(STORE_TS) || 0);
   if (!cached) {
     panelOutput({
       title: '养基宝',
-      content: token ? '首次拉取中，请稍后重新点击面板' : '请先打开 App 让 MITM 嗅探 token',
+      content: token ? '首次拉取中,请稍后重新点击面板' : '请先打开 App 让 MITM 嗅探 token',
       icon: 'chart.bar.fill',
       'icon-color': '#FF8C00',
     });
@@ -164,49 +152,36 @@ async function runPanel(arg) {
 
   let json;
   try { json = JSON.parse(cached); } catch (e) { json = null; }
-  const summary = buildSummary(json);
+  const s = buildSummary(json);
 
-  let agoText = '';
-  if (ts) {
-    const mins = Math.floor((Date.now() - ts) / 60000);
-    if (mins < 1) agoText = '刚刚更新';
-    else if (mins < 60) agoText = `${mins}分钟前更新`;
-    else agoText = `${Math.floor(mins / 60)}小时前更新`;
-  }
-
-  let vipBlock = '';
+  let marketBlock = '';
   try {
     const vipRaw = $.getdata(STORE_VIP);
     if (vipRaw) {
       const vd = JSON.parse(vipRaw);
-      if (vd.lines && vd.lines.length) {
-        const header = vd.lines.find(l => l.startsWith('--'));
-        const show = vd.lines.filter(l => !l.startsWith('--'));
-        if (show.length) vipBlock = '\n' + (header || '') + (header ? '\n' : '') + show.join('\n');
-      }
+      if (vd.lines && vd.lines.length) marketBlock = '\n' + vd.lines.join('\n');
     }
   } catch (e) {}
 
+  const title = `养基宝·${formatTime(new Date())} 『📈${s.upCount} ‖ ${s.downCount}📉』`;
   panelOutput({
-    title: summary.title || '养基宝',
-    content: summary.body + vipBlock,
-    icon: summary.icon || 'chart.bar.fill',
-    'icon-color': summary.color || '#FF8C00',
+    title,
+    content: s.subtitle + marketBlock,
+    icon: s.icon,
+    'icon-color': s.color,
   });
 }
 
 function panelOutput(obj) {
-  if (typeof $done === 'function') {
-    $done(obj);
-  } else {
-    $.log(JSON.stringify(obj));
-  }
+  if (typeof $done === 'function') $done(obj);
+  else $.log(JSON.stringify(obj));
   $._panel_done = true;
 }
 
+// 场内穿透摘要
 function buildSummary(json) {
   if (!json || json.code !== 200 || !json.data) {
-    return { title: '养基宝', subtitle: '数据为空', body: (json && json.message) || '响应解析失败' };
+    return { subtitle: (json && json.message) || '数据为空', upCount: 0, downCount: 0, icon: 'chart.bar.fill', color: '#FF8C00' };
   }
 
   const d = json.data;
@@ -214,41 +189,30 @@ function buildSummary(json) {
   const todayIncome = Number(d.today_income) || 0;
   const accounts = Array.isArray(d.account_data) ? d.account_data : [];
 
-  let totalCost = 0, totalHoldIncome = 0, upCount = 0, downCount = 0;
-  let navUpdated = true;
+  let upCount = 0, downCount = 0;
+  let navUpdated = accounts.length > 0;
   for (const a of accounts) {
-    totalCost += Number(a.hold_cost) || 0;
-    totalHoldIncome += Number(a.hold_income) || 0;
     upCount += Number(a.up) || 0;
     downCount += Number(a.down) || 0;
     if (a.nav_update === false) navUpdated = false;
   }
-  const totalIncomeRate = totalCost ? totalHoldIncome / totalCost : 0;
-  const todayIncomeRate = (totalAsset - todayIncome) ? todayIncome / (totalAsset - todayIncome) : 0;
-
-  const up = todayIncome >= 0;
-  const subtitle = `今日预估 ${signed(todayIncome)} (${signedRate(todayIncomeRate)})${navUpdated ? '' : '  [未更新]'}`;
-
-  const lines = [];
-  lines.push(`总资产     ${fmt(totalAsset)}`);
-  lines.push(`本    金     ${fmt(totalCost)}`);
-  lines.push(`累计收益  ${signed(totalHoldIncome)} (${signedRate(totalIncomeRate)})`);
-  lines.push(`基金涨跌  ${upCount} 涨 / ${downCount} 跌`);
-  if (accounts.length > 1) {
-    lines.push('');
-    for (const a of accounts) {
-      const r = Number(a.today_income_rate) || 0;
-      lines.push(`${a.title.padEnd(4, '\u3000')}  ${signed(a.today_income)} (${signedRate(r)})`);
-    }
-  }
+  const rate = (totalAsset - todayIncome) ? todayIncome / (totalAsset - todayIncome) : 0;
+  const subtitle = `${trendEmoji(todayIncome)}场内穿透 ${signed(todayIncome)} (${signedRate(rate)})${navUpdated ? ' [已更新☑️]' : ''}`;
 
   return {
-    title: '养基宝',
     subtitle,
-    body: lines.join('\n'),
-    icon: up ? 'chart.line.uptrend.xyaxis' : 'chart.line.downtrend.xyaxis',
-    color: up ? '#00A65A' : '#D9534F',
+    upCount,
+    downCount,
+    icon: todayIncome > 0 ? 'chart.line.uptrend.xyaxis' : todayIncome < 0 ? 'chart.line.downtrend.xyaxis' : 'chart.line.flattrend.xyaxis',
+    color: todayIncome > 0 ? '#D9534F' : todayIncome < 0 ? '#00A65A' : '#A0A0A0',
   };
+}
+
+// 涨🔴 跌🟢 平🔵
+function trendEmoji(v) {
+  const n = Number(v);
+  if (!isFinite(n) || n === 0) return '⚪️';
+  return n > 0 ? '🔴' : '🟢';
 }
 
 function fmt(v) {
@@ -271,14 +235,120 @@ function formatTime(d) {
   const p = (x) => String(x).padStart(2, '0');
   return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
+function isAfter1500(d) { return d.getHours() >= 15; }
+
+// ------------------ 大盘指数 + 成交额 ------------------
+
+async function fetchMarketLines(token, ua) {
+  const [idxRes, turnover] = await Promise.all([
+    fetchAPI(token, ua, '/market/v1/quote/index-data'),
+    fetchTurnover(),
+  ]);
+
+  const lines = ['-----------------------------'];
+  const map = {};
+  if (idxRes && Array.isArray(idxRes.data)) idxRes.data.forEach((i) => { if (i && i.name) map[i.name] = i; });
+
+  for (const name of ['上证指数', '创业板指']) {
+    const item = map[name];
+    if (!item) { lines.push(`⚪️${name} 暂无数据`); continue; }
+    const v = Number(item.v), r = Number(item.dir);
+    const vText = isFinite(v) ? v.toFixed(0) : '--';
+    const rText = isFinite(r) ? `${r >= 0 ? '+' : ''}${r.toFixed(2)}%` : '--';
+    lines.push(`${trendEmoji(r)}${name} ${vText}🔛${rText}`);
+  }
+
+  if (turnover && isFinite(turnover.today)) {
+    let line = `总成交额  ${fmtAmount(turnover.today)}`;
+    if (isAfter1500(new Date()) && isFinite(turnover.yesterday)) {
+      const diff = turnover.today - turnover.yesterday;
+      line += `   [较昨日${(diff >= 0 ? '+' : '') + (diff / 1e8).toFixed(2)}亿]`;
+    }
+    lines.push(line);
+  } else {
+    lines.push('总成交额  暂无数据');
+  }
+
+  return lines;
+}
+
+function fmtAmount(n) {
+  n = Number(n);
+  if (!isFinite(n)) return '--';
+  return Math.abs(n) >= 1e12 ? trimZero(n / 1e12) + '万亿' : trimZero(n / 1e8) + '亿';
+}
+function trimZero(v) {
+  return Number(v).toFixed(2).replace(/\.?0+$/, '');
+}
+
+// 东方财富:两市实时成交额 + 昨日成交额(15点后才查询)
+async function fetchTurnover() {
+  try {
+    const cur = await fetchExternalJSON(EASTMONEY_QUOTE_API);
+    const items = (cur && cur.data && cur.data.diff) || [];
+    let sh = NaN, sz = NaN;
+    for (const it of items) {
+      const amt = Number(it.f6);
+      if (!isFinite(amt)) continue;
+      if (String(it.f12) === '000001') sh = amt;
+      else if (String(it.f12) === '399001') sz = amt;
+    }
+    const today = (isFinite(sh) ? sh : 0) + (isFinite(sz) ? sz : 0);
+    if (!today) return null;
+
+    let yesterday = NaN;
+    if (isAfter1500(new Date())) {
+      const [y1, y2] = await Promise.all([prevTurnover('1.000001'), prevTurnover('0.399001')]);
+      if (isFinite(y1) && isFinite(y2)) yesterday = y1 + y2;
+    }
+    return { today, yesterday };
+  } catch (e) {
+    $.logErr('[YJB] 成交额获取失败: ' + e);
+    return null;
+  }
+}
+
+// 取指定指数最近一个非今日的日K成交额(即昨日盘后成交额)
+async function prevTurnover(secid) {
+  const url = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${secid}&klt=101&fqt=0&lmt=5&end=20500101&fields1=f1,f2,f3&fields2=f51,f57`;
+  const json = await fetchExternalJSON(url);
+  const klines = (json && json.data && Array.isArray(json.data.klines)) ? json.data.klines : [];
+  const todayKey = formatDateKey(new Date());
+
+  let last = NaN, lastDate = '';
+  for (const line of klines) {
+    const p = String(line).split(',');
+    if (p[0] < todayKey && p[0] > lastDate) { lastDate = p[0]; last = Number(p[1]); }
+  }
+  return last;
+}
+
+function fetchExternalJSON(url) {
+  const opts = {
+    url,
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json, */*',
+      'Referer': 'https://quote.eastmoney.com/',
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+    },
+  };
+  return new Promise((resolve) => {
+    $task_get(opts, (err, resp, body) => {
+      if (err || (resp && resp.status >= 400)) return resolve(null);
+      try { resolve(JSON.parse(body)); } catch (e) { resolve(null); }
+    });
+  });
+}
+
+// ------------------ 养基宝接口 ------------------
 
 async function fetchAPI(token, ua, path) {
   const url = HOST + path;
   const basePath = path.split('?')[0];
   const ts = String(Math.floor(Date.now() / 1000));
   const pureToken = token.replace(/^\w+:/, '');
-  const signUrl = HOST + basePath;
-  const sign = md5(signUrl + pureToken + SECRET + ts);
+  const sign = md5(HOST + basePath + pureToken + SECRET + ts);
 
   const opts = {
     url,
@@ -293,84 +363,12 @@ async function fetchAPI(token, ua, path) {
       'User-Agent': ua || '',
     },
   };
-
   return new Promise((resolve) => {
     $task_get(opts, (err, resp, body) => {
       if (err) { $.logErr('[YJB] ' + path + ' error: ' + err); return resolve(null); }
       try { resolve(JSON.parse(body)); } catch (e) { resolve(null); }
     });
   });
-}
-
-async function fetchVipLines(token, ua) {
-  const [vipRes, idxRes] = await Promise.all([
-    fetchAPI(token, ua, '/vip_information?page=1'),
-    fetchAPI(token, ua, '/market/v1/quote/index-data'),
-  ]);
-
-  const lines = [];
-  let dataDay = '';
-
-  if (idxRes && idxRes.data && Array.isArray(idxRes.data)) {
-    const want = ['上证指数', '深证成指', '创业板指'];
-    const items = idxRes.data.filter(i => want.includes(i.name));
-    if (items.length) {
-      if (items[0].date) dataDay = items[0].date.split(' ')[0].slice(5);
-      const parts = items.map(i => {
-        const d = Number(i.dir) || 0;
-        return `${i.name.replace('指数','')} ${Number(i.v).toFixed(0)} ${d >= 0 ? '+' : ''}${d.toFixed(2)}%`;
-      });
-      lines.push('大盘 ' + parts.join(' | '));
-    }
-  }
-
-  if (!dataDay && vipRes && vipRes.data && vipRes.data.day) {
-    dataDay = vipRes.data.day.slice(5);
-  }
-  if (dataDay) lines.unshift(`-- ${dataDay} 行情 --`);
-
-  let buyNum = 0, sellNum = 0;
-  const rankings = [];
-  if (vipRes && vipRes.data && Array.isArray(vipRes.data.list)) {
-    for (const item of vipRes.data.list) {
-      if (item.type === 'ranking') {
-        buyNum = Number(item.buy_num) || 0;
-        sellNum = Number(item.sell_num) || 0;
-        if (Array.isArray(item.buy_data)) {
-          item.buy_data.slice(0, 3).forEach(r => rankings.push(r));
-        }
-      }
-    }
-  }
-
-  if (buyNum || sellNum) {
-    const net = buyNum - sellNum;
-    const fmtW = v => (v / 10000).toFixed(0) + '万';
-    lines.push(`资金 流入${fmtW(buyNum)} / 流出${fmtW(sellNum)} 净${net >= 0 ? '流入' : '流出'}${fmtW(Math.abs(net))}`);
-  }
-
-  if (rankings.length) {
-    lines.push('榜单 ' + rankings.map(r => `${r.name || r.fund_name}(${r.rate || r.growth_rate})`).slice(0, 3).join(' | '));
-  }
-
-  return lines;
-}
-
-async function runVipCron(arg) {
-  const ck = getCK();
-  const token = arg.token || ck.auth;
-  if (!token) { $.msg('养基宝', '行情推送失败', '未获取 Authorization'); return; }
-
-  const tradingDay = await checkTradingDay(token, ck.ua);
-  if (!tradingDay) { $.log('[YJB] 非交易日,跳过行情推送'); return; }
-
-  const lines = await fetchVipLines(token, ck.ua);
-  if (!lines.length) { $.log('[YJB] 行情数据为空'); return; }
-
-  $.setdata(JSON.stringify({ lines, ts: Date.now() }), STORE_VIP);
-  $.setdata(String(Date.now()), STORE_VIP_TS);
-
-  $.msg('养基宝 · 行情', formatTime(new Date()), lines.join('\n'));
 }
 
 async function fetchAccountCollect(token, ua) {
@@ -395,7 +393,6 @@ async function fetchAccountCollect(token, ua) {
       'Connection': 'keep-alive',
     },
   };
-
   return new Promise((resolve) => {
     $task_get(opts, (err, resp, body) => {
       if (err) {
@@ -409,10 +406,7 @@ async function fetchAccountCollect(token, ua) {
         return resolve(null);
       }
       try { resolve(JSON.parse(body)); }
-      catch (e) {
-        $.logErr('[YJB] json parse fail: ' + e);
-        resolve(null);
-      }
+      catch (e) { $.logErr('[YJB] json parse fail: ' + e); resolve(null); }
     });
   });
 }
