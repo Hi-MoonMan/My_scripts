@@ -1,0 +1,32 @@
+#!name = 养基宝_数据推送
+#!desc = 获取养基宝 Authorization，在工作日开盘、午间休市、收盘及晚间净值更新后推送基金资产汇总。首次使用请开启获取凭证并打开养基宝 App。
+#!author = MoonMan[https://github.com/Hi-MoonMan]
+#!icon = https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/yjb.png
+#!tag = 养基宝,基金,资产通报
+#!loon_version = 3.2.1(734)
+#!type = normal
+
+[Argument]
+cookieEnable = switch,true,tag=获取养基宝凭证,desc=开启后打开养基宝 App，插件会自动获取并保存 Authorization。获取成功后可以关闭此开关
+
+openCron = input,"35 9 * * 1-5",tag=开盘通报时间,desc=默认工作日09:35，使用五段式 Cron 表达式
+
+noonCron = input,"35 11 * * 1-5",tag=午间通报时间,desc=默认工作日11:35，建议设置在11:30休市之后
+
+closeCron = input,"5 15 * * 1-5",tag=收盘通报时间,desc=默认工作日15:05，建议设置在15:00收盘之后
+
+nightCron = input,"11 19 * * 1-5",tag=晚间净值通报时间,desc=默认工作日19:11，可根据基金真实净值更新时间调整
+
+[Script]
+http-response ^https?:\/\/app-api\.yangjibao\.com\/ script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/yjb.js,requires-body=false,timeout=30,enable={cookieEnable},tag=养基宝-获取Authorization
+
+cron {openCron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/yjb.js,timeout=120,tag=养基宝-开盘估值通报
+
+cron {noonCron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/yjb.js,timeout=120,tag=养基宝-午间估值通报
+
+cron {closeCron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/yjb.js,timeout=120,tag=养基宝-收盘估值通报
+
+cron {nightCron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/yjb.js,timeout=120,tag=养基宝-晚间净值汇总
+
+[MITM]
+hostname = app-api.yangjibao.com
