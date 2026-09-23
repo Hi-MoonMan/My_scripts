@@ -14,27 +14,32 @@ notify = switch,true,tag=通知开关,desc=关闭后不通知
 # --- 一点万象 ---
 ydwx-token = switch, true, false, tag = [一点万象]获取Token, desc = 开启后打开App获取Cookie
 ydwx-task  = switch, true, false, tag = [一点万象]签到Task, desc = 开启后系统会自动后台签到
-ydwx-cron  = input, "0 20 7 * * *", tag = [一点万象]时间Cron, desc = 默认每天7点20分
+ydwx-cron  = input, "0 0 7 * * *", tag = [一点万象]时间Cron, desc = 默认每天7点
 
-# --- 苹果软件站 ---
-iios-token = switch, true, false, tag = [苹果软件站]获取Token, desc = 开启后打开App获取Cookie
-iios-task  = switch, true, false, tag = [苹果软件站]签到Task, desc = 开启后系统会自动后台签到
-iios-cron  = input, "0 20 7 * * *", tag = [苹果软件站]时间Cron, desc = 默认每天7点20分
+# --- 财新 ---
+cx-token = switch, true, false, tag = [财新]获取Token, desc = 开启后打开App获取Cookie
+cx-task  = switch, true, false, tag = [财新]签到Task, desc = 开启后系统会自动后台签到
+cx-cron  = input, "0 10 7 * * *", tag = [财新]时间Cron, desc = 默认每天7点10分
 
 # --- 小蚕惠生活 ---
 xcbwc-token = switch, false, false, tag = [小蚕惠生活]获取Token, desc = 开启后打开App获取Cookie
 xcbwc-task  = switch, false, false, tag = [小蚕惠生活]签到Task, desc = 开启后系统会自动后台签到
-xcbwc-cron  = input, "0 30 7 * * *", tag = [小蚕惠生活]时间Cron, desc = 默认每天7点30分
+xcbwc-cron  = input, "0 20 7 * * *", tag = [小蚕惠生活]时间Cron, desc = 默认每天7点20分
 
 # --- 歪麦霸王餐 ---
 wmbwc-token = switch, false, false, tag = [歪麦霸王餐]获取Token, desc = 开启后打开App获取Cookie
 wmbwc-task  = switch, false, false, tag = [歪麦霸王餐]签到Task, desc = 开启后系统会自动后台签到
-wmbwc-cron  = input, "0 40 7 * * *", tag = [歪麦霸王餐]时间Cron, desc = 默认每天7点40分
+wmbwc-cron  = input, "0 30 7 * * *", tag = [歪麦霸王餐]时间Cron, desc = 默认每天7点30分
 
 # --- 晓晓优选 ---
 xxyx-token = switch, false, false, tag = [晓晓优选]获取Token, desc = 开启后打开App获取Cookie
 xxyx-task  = switch, false, false, tag = [晓晓优选]签到Task, desc = 开启后系统会自动后台签到
-xxyx-cron  = input, "0 50 7 * * *", tag = [晓晓优选]时间Cron, desc = 默认每天7点50分
+xxyx-cron  = input, "0 40 7 * * *", tag = [晓晓优选]时间Cron, desc = 默认每天7点40分
+
+# --- 苹果软件站 ---
+iios-token = switch, true, false, tag = [苹果软件站]获取Token, desc = 开启后打开App获取Cookie
+iios-task  = switch, true, false, tag = [苹果软件站]签到Task, desc = 开启后系统会自动后台签到
+iios-cron  = input, "0 50 7 * * *", tag = [苹果软件站]时间Cron, desc = 默认每天7点50分
 
 # --- 携程旅行 ---
 ctrip-token = switch, true, false, tag = [携程旅行]获取Token, desc = 开启后打开App获取Cookie
@@ -70,9 +75,9 @@ cron "35 7-23/1 * * *" script-path=https://raw.githubusercontent.com/Hi-MoonMan/
 http-request ^https?:\/\/app\.mixcapp\.com\/mixc\/gateway script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, requires-body=true, tag=一点万象获取Cookie, enabled={ydwx-token}
 cron {ydwx-cron} script-path=https://raw.githubusercontent.com/Hi-MoonMan/My_scripts/refs/heads/main/YDWX.js, tag=一点万象定时任务, enabled={ydwx-task}
 
-# --- 苹果软件站 Scripts ---
-http-request ^https:\/\/www\.iios\.fun\/api\/user\/info script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站获取Cookie, enabled={iios-token}
-cron {iios-cron} script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站定时任务, enabled={iios-task}
+# --- 财新 Scripts ---
+http-request ^https:\/\/gateway\.caixin\.com\/api\/(?:signin\/markRecord\/markRecordForCookie|answeractivity\/userParticipateActivity\/(?:userGetActivityForCookie|findUserActivityDetailForCookie)|integral\/assignmentConfig\/findAssignmentConfigList|app-api\/integral\/getUserIntegral) script-path=https://github.com/ddgksf2013/Scripts/raw/master/caixin_daily.js, tag=财新获取Cookie, enabled={cx-token}
+cron {cx-cron} script-path=https://github.com/ddgksf2013/Scripts/raw/master/caixin_daily.js, tag=财新定时任务, enabled={cx-task}
 
 # --- 小蚕惠生活 Scripts ---
 http-request ^https:\/\/gw\.xiaocantech\.com\/rpc script-path=https://gist.githubusercontent.com/Sliverkiss/27c601d97a3f8960b212e5cac5b6c470/raw/xcbwc.js, tag=小蚕惠生活获取Cookie, enabled={xcbwc-token}
@@ -85,6 +90,10 @@ cron {wmbwc-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/49a9
 # --- 晓晓优选 Scripts ---
 http-response ^https:\/\/xxyx-client-api\.xiaoxiaoyouxuan\.com\/my script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选获取Cookie, enabled={xxyx-token}
 cron {xxyx-cron} script-path=https://gist.githubusercontent.com/Sliverkiss/991a81be1fc8cf2a1937432be68f5521/raw/xxyx.js, tag=晓晓优选定时任务, enabled={xxyx-task}
+
+# --- 苹果软件站 Scripts ---
+http-request ^https:\/\/www\.iios\.fun\/api\/user\/info script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站获取Cookie, enabled={iios-token}
+cron {iios-cron} script-path=https://raw.githubusercontent.com/ZenmoFeiShi/Qx/refs/heads/main/iios_checkin.js, tag=苹果软件站定时任务, enabled={iios-task}
 
 # --- 携程旅行 Scripts ---
 http-response ^https:\/\/m\.ctrip\.com\/restapi\/soa2\/\d+\/[a-zA-Z]+Login(?:$|\?) script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Ctrip-DailyBonus/Ctrip.js, requires-body=true, tag=携程旅行获取Cookie, enabled={ctrip-token}
@@ -107,7 +116,7 @@ http-request ^https?:\/\/api\.kkmh\.com\/v\d\/passport\/user script-path=https:/
 cron {kkmh-cron} script-path=https://raw.githubusercontent.com/NobyDa/Script/master/KuaiKan-DailyBonus/KKMH.js, tag=快看漫画签到, enabled={kkmh-task}
 
 [MITM]
-hostname = 360.com, app.mixcapp.com, www.iios.fun, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
+hostname = 360.com, app.mixcapp.com, gateway.caixin.com, gw.xiaocantech.com, wmapp-api.waimaimingtang.com, xxyx-client-api.xiaoxiaoyouxuan.com, www.iios.fun, m.ctrip.com, passport.iqiyi.com, c.tieba.baidu.com, tiebac.baidu.com, app.bilibili.com, api.kkmh.com
 
 
 
