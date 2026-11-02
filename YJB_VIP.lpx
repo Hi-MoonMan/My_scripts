@@ -1,0 +1,13 @@
+#!name=养基宝 VIP
+#!desc=伪装VIP会员，去除应用内广告推广
+#!author=MoonMan[https://github.com/Hi-MoonMan]
+#!homepage= https://github.com/Hi-MoonMan
+#!icon=https://raw.githubusercontent.com/Hi-MoonMan/My_icons/refs/heads/Main/yjb.png
+#!date=2026-11-02 18:00:00
+
+[Rewrite]
+^https?:\/\/.*yangjibao\.com\/.*\/(?:account|vip_info) response-body-json-jq '.data.vip_label = true | .data.vip_expiry_date = "2099-12-31" | .data.is_pay = true'
+^https?:\/\/.*yangjibao\.com\/unify_ad response-body-json-jq '.data = null'
+
+[MITM]
+hostname = *.yangjibao.com
