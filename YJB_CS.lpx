@@ -1,0 +1,10 @@
+#!name=养基宝去广告
+#!desc=养基宝响应内容重写
+#!author=自用
+
+[Rewrite]
+^https?:\/\/.*yangjibao\.com\/.*\/(?:account|vip_info) response-body-json-jq '.data.vip_label = true | .data.vip_expiry_date = "2099-12-31" | .data.is_pay = true'
+^https?:\/\/.*yangjibao\.com\/unify_ad response-body-json-jq '.data = null'
+
+[MITM]
+hostname = *.yangjibao.com
